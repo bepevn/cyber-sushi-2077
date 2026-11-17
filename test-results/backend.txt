@@ -1,0 +1,12 @@
+test_delivery_server_clock_and_duplicate (test_backend.StoreTests.test_delivery_server_clock_and_duplicate) ... ok
+test_idempotent_save_and_revision_conflict (test_backend.StoreTests.test_idempotent_save_and_revision_conflict) ... ok
+test_offline_restores_customer_clock_but_settles_delivery (test_backend.StoreTests.test_offline_restores_customer_clock_but_settles_delivery) ... ok
+test_original_delivery_due_cannot_shift_on_autosave (test_backend.StoreTests.test_original_delivery_due_cannot_shift_on_autosave) ... ok
+test_owned_path_and_identity_isolation (test_backend.StoreTests.test_owned_path_and_identity_isolation) ... ok
+test_tab_lease_and_release (test_backend.StoreTests.test_tab_lease_and_release) ... ok
+test_validation (test_backend.StoreTests.test_validation) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+OK
