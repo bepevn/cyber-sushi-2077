@@ -1,0 +1,95 @@
+TAP version 13
+# Subtest: 90 seconds is valid; >90 is timeout
+ok 1 - 90 seconds is valid; >90 is timeout
+  ---
+  duration_ms: 3.850529
+  ...
+# Subtest: fifth complaint wins over final-customer summary
+ok 2 - fifth complaint wins over final-customer summary
+  ---
+  duration_ms: 0.580239
+  ...
+# Subtest: wrong order leaves immediately without money
+ok 3 - wrong order leaves immediately without money
+  ---
+  duration_ms: 0.403466
+  ...
+# Subtest: low quality correct meal is satisfied
+ok 4 - low quality correct meal is satisfied
+  ---
+  duration_ms: 1.185981
+  ...
+# Subtest: 30 second shipping boundary and exactly-once arrival
+ok 5 - 30 second shipping boundary and exactly-once arrival
+  ---
+  duration_ms: 0.548734
+  ...
+# Subtest: reject negative fractional over-budget and unknown orders atomically
+ok 6 - reject negative fractional over-budget and unknown orders atomically
+  ---
+  duration_ms: 1.115938
+  ...
+# Subtest: inventory consumption once, invalid mixtures allowed, shortage blocked
+ok 7 - inventory consumption once, invalid mixtures allowed, shortage blocked
+  ---
+  duration_ms: 0.673792
+  ...
+# Subtest: unlocks match 1,5,...60 and continue every 5 days, no duplicate mixes
+ok 8 - unlocks match 1,5,...60 and continue every 5 days, no duplicate mixes
+  ---
+  duration_ms: 17.964599
+  ...
+# Subtest: tip tiers, speed boundary and integer rounding
+ok 9 - tip tiers, speed boundary and integer rounding
+  ---
+  duration_ms: 0.440251
+  ...
+# Subtest: initial stock cost counted but not purchased; ledger cashflow differs from profit
+ok 10 - initial stock cost counted but not purchased; ledger cashflow differs from profit
+  ---
+  duration_ms: 0.502671
+  ...
+# Subtest: closing purchases charged next day, date increases only at prepare
+ok 11 - closing purchases charged next day, date increases only at prepare
+  ---
+  duration_ms: 0.565812
+  ...
+# Subtest: save/restore preserves queue RNG timer ingredients cooking and deliveries
+ok 12 - save/restore preserves queue RNG timer ingredients cooking and deliveries
+  ---
+  duration_ms: 1.666215
+  ...
+# Subtest: gameover survives restore and cannot start next day
+ok 13 - gameover survives restore and cannot start next day
+  ---
+  duration_ms: 0.364121
+  ...
+# Subtest: customer counts cap at 18 and only unlocked menu orders
+ok 14 - customer counts cap at 18 and only unlocked menu orders
+  ---
+  duration_ms: 6.349792
+  ...
+# Subtest: tutorial pauses customer but not cooking
+ok 15 - tutorial pauses customer but not cooking
+  ---
+  duration_ms: 0.402427
+  ...
+# Subtest: elapsed-time mini-games finish without frame count dependency
+ok 16 - elapsed-time mini-games finish without frame count dependency
+  ---
+  duration_ms: 4.770951
+  ...
+# Subtest: all daily orders resolve before summary
+ok 17 - all daily orders resolve before summary
+  ---
+  duration_ms: 0.849756
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 123.343285

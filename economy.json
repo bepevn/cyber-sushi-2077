@@ -1,0 +1,41 @@
+{
+  "assumptions": "Correct orders only; shortage purchases arrive after 30 seconds; 20 second cooking; no discards. Does not prove human difficulty balance.",
+  "reports": [
+    {
+      "days": 120,
+      "quality": 0,
+      "minimumCash": 300,
+      "endingCash": 33536,
+      "foodSales": 53649,
+      "tips": 13,
+      "purchases": 20426,
+      "consumedCost": 20522,
+      "operatingProfit": 33140,
+      "served": 2082
+    },
+    {
+      "days": 120,
+      "quality": 80,
+      "minimumCash": 300,
+      "endingCash": 41637,
+      "foodSales": 53649,
+      "tips": 8114,
+      "purchases": 20426,
+      "consumedCost": 20522,
+      "operatingProfit": 41241,
+      "served": 2082
+    },
+    {
+      "days": 120,
+      "quality": 95,
+      "minimumCash": 300,
+      "endingCash": 47420,
+      "foodSales": 53649,
+      "tips": 13897,
+      "purchases": 20426,
+      "consumedCost": 20522,
+      "operatingProfit": 47024,
+      "served": 2082
+    }
+  ]
+}
