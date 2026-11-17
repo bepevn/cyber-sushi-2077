@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // This game uses ONLY a trusted Python backend for Firestore operations.
+    // Admin SDK bypasses rules: backend.py verifies ID tokens and derives UID.
+    // Deny browser SDK and REST database access, even to authenticated clients.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
