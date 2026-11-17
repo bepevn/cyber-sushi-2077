@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CYBER SUSHI</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div id="app">
+ <header><a id="brand" href="#">CYBER<span>SUSHI</span><small>NIGHT SHIFT / 夜の鮨</small></a><div class="header-right"><span id="mode" class="chip">LOCAL DEMO</span><span id="saveStatus">시작 준비</span><button id="retry" hidden>저장 재시도</button><button id="sound" aria-label="음소거 설정">SOUND OFF</button><button id="menuBtn">메뉴</button></div></header>
+ <main id="screen"></main>
+ <div id="toast" role="status" aria-live="polite"></div>
+ <div id="modal" hidden><div class="modal-card"><button id="closeModal" class="close" aria-label="닫기">×</button><div id="modalContent"></div></div></div>
+ <footer><span>SECTOR 07 · RAIN DISTRICT</span><span>클릭 / SPACE · 밥 쥐기: 길게 누르기</span><span id="network">로컬 저장 · 클라우드와 별개</span></footer>
+</div>
+<script src="engine.js"></script><script src="app.js"></script>
+</body></html>

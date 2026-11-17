@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "economy": {"startingCash":300,"startingInventory":{"rice":16,"salmon":8,"egg":8},"customerSeconds":90,"deliverySeconds":30,"maxComplaints":5,"baseCustomers":6,"maxCustomers":18,"tipBands":[[95,0.25],[80,0.15],[60,0.05],[0,0]],"fastSeconds":30,"fastTip":0.05,"maxTip":0.30,"extraMarkup":2.15,"extraStagePremium":2},
+  "ingredients": [
+    {"id":"rice","name":"초밥밥","cost":2,"color":"#f4eddd"},
+    {"id":"salmon","name":"연어","cost":5,"color":"#ff866e"},
+    {"id":"egg","name":"계란","cost":3,"color":"#ffd46c"},
+    {"id":"nori","name":"김","cost":1,"color":"#254e46"},
+    {"id":"cucumber","name":"오이","cost":2,"color":"#78d898"},
+    {"id":"tuna","name":"참치","cost":7,"color":"#e55389"},
+    {"id":"shrimp","name":"새우","cost":6,"color":"#ffb3a2"},
+    {"id":"eel","name":"장어","cost":9,"color":"#b67d50"},
+    {"id":"sauce","name":"특제소스","cost":2,"color":"#c491ff"}
+  ],
+  "recipes": [
+    {"id":"salmon","name":"연어초밥","day":1,"ingredients":{"rice":1,"salmon":1},"price":18,"difficulty":0.85,"style":"nigiri"},
+    {"id":"egg","name":"계란초밥","day":1,"ingredients":{"rice":1,"egg":1},"price":14,"difficulty":0.8,"style":"nigiri"},
+    {"id":"cucumber","name":"오이마키","day":5,"ingredients":{"rice":1,"nori":1,"cucumber":1},"price":16,"difficulty":0.95,"style":"roll"},
+    {"id":"tuna","name":"참치초밥","day":10,"ingredients":{"rice":1,"tuna":1},"price":23,"difficulty":1.05,"style":"nigiri"},
+    {"id":"shrimp","name":"새우초밥","day":15,"ingredients":{"rice":1,"shrimp":1},"price":21,"difficulty":1.05,"style":"nigiri"},
+    {"id":"eel","name":"장어초밥","day":20,"ingredients":{"rice":1,"eel":1,"sauce":1},"price":30,"difficulty":1.15,"style":"nigiri"},
+    {"id":"neon","name":"네온연어롤","day":25,"ingredients":{"rice":1,"salmon":1,"nori":1,"cucumber":1},"price":27,"difficulty":1.2,"style":"roll"},
+    {"id":"cyber","name":"사이버모둠","day":30,"ingredients":{"rice":2,"salmon":1,"tuna":1,"egg":1},"price":45,"difficulty":1.25,"style":"platter"},
+    {"id":"aurora","name":"오로라 새우롤","day":35,"ingredients":{"rice":1,"shrimp":1,"nori":1,"cucumber":1},"difficulty":1.25,"style":"roll"},
+    {"id":"violet","name":"바이올렛 참치롤","day":40,"ingredients":{"rice":1,"tuna":1,"nori":1,"sauce":1},"difficulty":1.3,"style":"roll"},
+    {"id":"gold","name":"골드러시 장어롤","day":45,"ingredients":{"rice":1,"eel":1,"nori":1,"egg":1},"difficulty":1.3,"style":"roll"},
+    {"id":"duo","name":"트윈 네온 니기리","day":50,"ingredients":{"rice":2,"salmon":1,"shrimp":1},"difficulty":1.35,"style":"platter"},
+    {"id":"garden","name":"네온 가든 마키","day":55,"ingredients":{"rice":1,"egg":1,"nori":1,"cucumber":1,"sauce":1},"difficulty":1.35,"style":"roll"},
+    {"id":"omakase","name":"미드나이트 오마카세","day":60,"ingredients":{"rice":2,"tuna":1,"eel":1,"shrimp":1,"sauce":1},"difficulty":1.4,"style":"platter"}
+  ],
+  "expansion":{"startDay":65,"interval":5,"prefix":"시그니처","maxRice":2,"maxOtherIngredients":3,"difficulty":1.4,"style":"roll"},
+  "patrons":[
+    {"name":"유나","role":"네온 택배기사","color":"#4de1ce","hair":"#e7ebff","line":"빗길을 달렸더니 배고프네.","happy":"이 맛이면 야간 배송도 거뜬하지.","angry":"다음 배달 시간이 다 됐어…"},
+    {"name":"렉스","role":"의체 정비사","color":"#ffb464","hair":"#6b46c9","line":"오늘도 손맛은 아날로그지?","happy":"완벽한 튜닝이야, 셰프.","angry":"이건 내 주문이 아닌데."},
+    {"name":"미카","role":"홀로그램 가수","color":"#f678cb","hair":"#f49ad4","line":"공연 전에 한 접시 부탁해.","happy":"다음 공연에 초대할게!","angry":"무대에 늦겠어. 먼저 갈게."},
+    {"name":"제로","role":"데이터 잠수부","color":"#8b9eff","hair":"#1a243c","line":"로그 없이 조용히 먹고 갈게.","happy":"별 다섯 개. 익명으로 남길게.","angry":"연결을 종료하지."},
+    {"name":"박 형사","role":"야간 순찰대","color":"#d7bd75","hair":"#787e90","line":"도시도 가끔은 따뜻한 밥이 필요해.","happy":"이 골목은 내가 지킬게.","angry":"순찰부터 돌아야겠군."},
+    {"name":"루프","role":"신스 음악가","color":"#b190ff","hair":"#51d6bc","line":"칼질 소리가 좋은 비트인데?","happy":"오늘 밤의 베스트 트랙이야.","angry":"오늘은 박자가 안 맞네."}
+  ]
+}
