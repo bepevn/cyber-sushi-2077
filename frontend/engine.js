@@ -57,22 +57,25 @@ class Engine {
  cutCursor(c){return (Math.sin(c.time*(3.4*c.difficulty)+c.cuts)+1)/2;}
  riceTarget(c){return 0.5+Math.sin(c.time*1.5*c.difficulty)*0.23;}
  plateCursor(c){return (Math.sin(c.time*3*c.difficulty)+1)/2;}
- act(s){const c=s.cooking;if(!c)return;
-  if(c.stage==='cut'){c.scores.push(Math.max(0,100-Math.abs(this.cutCursor(c)-this.cutTarget(c))*220*c.difficulty));c.cuts++;c.time=0;if(c.cuts>=3)c.stage='rice';}
-  else if(c.stage==='plate'){c.scores.push(Math.max(0,100-Math.abs(this.plateCursor(c)-0.5)*230*c.difficulty));this.finish(s);}
+ rating(score){return score>=95?'PERFECT':score>=80?'GREAT':score>=60?'GOOD':'MISS';}
+ feedback(s,score,delay=0.85){s.feedback={label:this.rating(score),score:Math.round(score),left:delay};if(s.cooking)s.cooking.cooldown=delay;}
+ act(s){const c=s.cooking;if(!c||c.cooldown>0)return;
+  if(c.stage==='cut'){c.scores.push(Math.max(0,100-Math.abs(this.cutCursor(c)-this.cutTarget(c))*220*c.difficulty));c.cuts++;c.time=0;if(c.cuts>=3)c.stage='rice';this.feedback(s,c.scores[c.scores.length-1],c.stage==='rice'?1.3:0.85);}
+  else if(c.stage==='plate'){c.scores.push(Math.max(0,100-Math.abs(this.plateCursor(c)-0.5)*230*c.difficulty));this.feedback(s,c.scores[c.scores.length-1],1.3);this.finish(s);}
  }
  finish(s){const c=s.cooking;s.dish={mix:c.mix,menu:c.menu,quality:Math.round(c.scores.reduce((a,b)=>a+b,0)/c.scores.length)};s.cooking=null;}
  tick(s,dt,held=false){if(!Number.isFinite(dt)||dt<=0)return null;
   if(s.phase!=='service')return null;
+  if(s.feedback)s.feedback.left=Math.max(0,s.feedback.left-dt);
   if(!s.tutorial){s.elapsed+=dt;if(s.elapsed>this.e.customerSeconds){return this.resolve(s,false,'시간 초과');}}
   const c=s.cooking;if(!c)return null;
   // Integrate control in small elapsed-time steps, independent of display FPS.
-  let remaining=dt;while(remaining>0&&s.cooking){const step=Math.min(remaining,1/60);remaining-=step;c.time+=step;
-   if(c.stage==='cut'&&c.time>=2.7){c.scores.push(0);c.cuts++;c.time=0;if(c.cuts>=3)c.stage='rice';}
+  let remaining=dt;while(remaining>0&&s.cooking){const step=Math.min(remaining,1/60);remaining-=step;if(c.cooldown>0){c.cooldown=Math.max(0,c.cooldown-step);continue;}c.time+=step;
+   if(c.stage==='cut'&&c.time>=2.7){c.scores.push(0);c.cuts++;c.time=0;if(c.cuts>=3)c.stage='rice';this.feedback(s,0,c.stage==='rice'?1.3:0.85);}
    else if(c.stage==='rice'){
     c.bar=Math.max(0,Math.min(1,c.bar+(held?0.58:-0.36)*step));if(Math.abs(c.bar-this.riceTarget(c))<=0.17/c.difficulty)c.inside+=step;
-    if(c.time>=6){c.scores.push(Math.min(100,c.inside/6*100));c.stage='plate';c.time=0;}
-   }else if(c.stage==='plate'&&c.time>=3.2){c.scores.push(0);this.finish(s);}
+    if(c.time>=6){c.scores.push(Math.min(100,c.inside/6*100));c.stage='plate';c.time=0;this.feedback(s,c.scores[c.scores.length-1],1.3);}
+   }else if(c.stage==='plate'&&c.time>=3.2){c.scores.push(0);this.feedback(s,0,1.3);this.finish(s);}
   }return null;
  }
  tip(price,quality,seconds){if(seconds>this.e.customerSeconds)return 0;const base=this.e.tipBands.find(([q])=>quality>=q)[1];return Math.round(price*Math.min(this.e.maxTip,base+(seconds<=this.e.fastSeconds?this.e.fastTip:0)));}

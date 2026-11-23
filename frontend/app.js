@@ -102,7 +102,7 @@ function foodIcon(i){return `<i class="food-icon" data-id="${i.id}" style="--foo
 function statsHTML(){return `<div class="stats"><div class="stat"><small>NIGHT SHIFT</small><b>DAY ${S.day}</b></div><div class="stat cash"><small>CREDITS</small><b>${S.cash.toLocaleString()} C</b></div><div class="stat bad"><small>COMPLAINTS</small><b>${S.complaints} / ${E.e.maxComplaints}</b></div></div>`;}
 function deliveryHTML(){return `<section class="panel deliveries"><div class="panel-head"><span>DRONE LOGISTICS / 배송 현황</span><button class="small" id="shop">재료 주문</button></div><div class="delivery-list" id="deliveryList"></div></section>`;}
 function deliveryUpdate(){const el=$('#deliveryList');if(!el||!S)return;el.innerHTML=S.deliveries.length?S.deliveries.map(d=>`<span class="delivery-item">${esc(ingredientsText(d.mix))} · <b>${Math.max(0,Math.ceil((d.due-serverNow())/1000))}s</b></span>`).join(''):'배송 중인 주문 없음 · 주문 후 30초 뒤 도착';}
-const guides=[['재료를 직접 골라요','주문서의 레시피를 보고 아래 트레이에서 재료를 선택하세요. 같은 재료를 여러 번 누르면 수량이 늘어납니다.'],['칼질 타이밍','조리 시작 후 밝은 막대가 청록 구간 중앙에 올 때 클릭 또는 SPACE. 총 3번입니다.'],['밥을 쥐어요','버튼 또는 SPACE를 누르고 있으면 막대가 올라가고, 놓으면 내려갑니다. 움직이는 청록 구간을 6초간 따라가세요.'],['플레이팅과 서빙','마지막 게이지 중앙에서 토핑을 올리고 서빙하세요. 틀린 재료 조합도 요리가 되지만 손님은 떠납니다.'],['재료 구매','배송 현황의 재료 주문에서 수량을 입력해 구매하세요. 현금은 즉시 차감되고 30초 뒤 재고가 됩니다.'],['영업 시작 준비 완료','안내를 마치면 손님당 90초가 적용됩니다. 메뉴에서는 일시 정지, 주문·도감 패널에서는 계속 흐릅니다.']];
+const guides=[['재료를 직접 골라요','카운터에서 주문 받기를 누르고 주방으로 이동하세요. 주문서를 보고 트레이에서 재료를 선택하세요. 같은 재료를 여러 번 누르면 수량이 늘어납니다.'],['칼질 타이밍','조리 시작 후 밝은 막대가 청록 구간 중앙에 올 때 클릭 또는 SPACE. 총 3번입니다.'],['밥을 쥐어요','버튼 또는 SPACE를 누르고 있으면 막대가 올라가고, 놓으면 내려갑니다. 움직이는 청록 구간을 6초간 따라가세요.'],['플레이팅과 서빙','토핑을 올린 뒤 포장하고 카운터로 이동하세요. 포장 상자를 손님 전달 영역으로 드래그해 놓으세요. 틀린 재료 조합도 요리가 되지만 손님은 떠납니다.'],['재료 구매','배송 현황의 재료 주문에서 수량을 입력해 구매하세요. 현금은 즉시 차감되고 30초 뒤 재고가 됩니다.'],['영업 시작 준비 완료','안내를 마치면 손님당 90초가 적용됩니다. 메뉴에서는 일시 정지, 주문·도감 패널에서는 계속 흐릅니다.']];
 function guideHTML(){if(!S.tutorial)return '';const g=guides[S.tutorialStep];return `<div class="guide"><div><strong>TUTORIAL ${S.tutorialStep+1}/6 · ${g[0]}</strong><br>${g[1]}<br><span class="muted">튜토리얼 중 손님 타이머 정지 · 조리는 실제로 진행됩니다.</span></div><div class="tools"><button class="small" id="guideNext">${S.tutorialStep===5?'안내 마치기':'다음'}</button><button class="small ghost" id="guideSkip">건너뛰기</button></div></div>`;}
 function resultHTML(){if(!S.lastResult)return '';const r=S.lastResult,p=C.patrons[r.patron];return `<div class="result-banner ${r.ok?'':'fail'}"><b>${r.reason}</b> · 품질 ${r.quality}점 · ${r.seconds.toFixed(1)}초 · 판매 ${r.price}C + 팁 ${r.tip}C<br>“${esc(r.ok?p.happy:p.angry)}”</div>`;}
 function kitchenHTML(){
@@ -110,9 +110,50 @@ function kitchenHTML(){
  let bench='<div class="empty-board">재료를 선택하고 조리를 시작하세요</div>';
  if(c){const title={cut:'01 / 칼질 · '+(c.cuts+1)+'번째',rice:'02 / 밥 쥐기',plate:'03 / 토핑 플레이팅'}[c.stage];bench=`<div class="mini"><div class="mini-title">${title}</div><div class="stage-pips"><i class="on"></i><i class="${c.stage!=='cut'?'on':''}"></i><i class="${c.stage==='plate'?'on':''}"></i></div><div class="gauge ${c.stage==='rice'?'rice-gauge':''}"><div class="target" id="target"></div><div class="cursor" id="cursor"></div></div><button id="miniAction" class="primary">${c.stage==='rice'?'길게 누르기 / 놓기':'타이밍 맞추기 · SPACE'}</button><div class="mini-hint" id="miniHint"></div></div>`;}
  else if(d)bench='<canvas class="dish-canvas" id="dishCanvas"></canvas>';
- return `<div class="panel"><div class="panel-head"><span>PREP STATION / 조리대</span><span>${c?'COOKING':d?'READY TO SERVE':'SELECT INGREDIENTS'}</span></div><div class="kitchen-body"><div class="bench"><span class="bench-label">${d?'QUALITY '+d.quality+' / 100':'HANDCRAFTED · NOT AUTOMATED'}</span>${bench}</div><div class="ingredient-grid">${C.ingredients.map(i=>`<button class="ingredient ${(selected[i.id]||0)?'selected':''}" data-ing="${i.id}" ${c||d?'disabled':''}>${foodIcon(i)}<span>${i.name}<small>재고 ${S.inventory[i.id]} · ${i.cost}C</small></span>${selected[i.id]?'<b>×'+selected[i.id]+'</b>':''}</button>`).join('')}</div><div class="ingredient-info"><span>${Object.keys(selected).length?esc(ingredientsText(selected)):'선택한 재료 없음'}</span><button id="clearMix" class="small ghost" ${c||d?'disabled':''}>선택 초기화</button></div><div class="action-row"><button id="begin" class="primary" ${c||d?'disabled':''}>조리 시작</button><button id="serve" class="primary" ${!d?'disabled':''}>음식 서빙</button><button id="discard" ${!c&&!d?'disabled':''}>폐기</button></div></div></div>`;
+ return `<div class="panel"><div class="panel-head"><span>PREP STATION / 조리대</span><span>${c?'COOKING':d?'READY TO SERVE':'SELECT INGREDIENTS'}</span></div><div class="kitchen-body"><div class="bench"><span class="bench-label">${d?'QUALITY '+d.quality+' / 100':'HANDCRAFTED · NOT AUTOMATED'}</span>${bench}</div><div class="ingredient-grid">${C.ingredients.map(i=>`<button class="ingredient ${(selected[i.id]||0)?'selected':''}" data-ing="${i.id}" ${c||d?'disabled':''}>${foodIcon(i)}<span>${i.name}<small>재고 ${S.inventory[i.id]} · ${i.cost}C</small></span>${selected[i.id]?'<b>×'+selected[i.id]+'</b>':''}</button>`).join('')}</div><div class="ingredient-info"><span>${Object.keys(selected).length?esc(ingredientsText(selected)):'선택한 재료 없음'}</span><button id="clearMix" class="small ghost" ${c||d?'disabled':''}>선택 초기화</button></div><div class="action-row"><button id="begin" class="primary" ${c||d?'disabled':''}>조리 시작</button><button id="packFood" class="primary" ${!d?'disabled':''}>포장하고 카운터로</button><button id="discard" ${!c&&!d?'disabled':''}>폐기</button></div></div></div>`;
 }
-function serviceHTML(){const q=S.queue[S.index],r=E.menu(S,q.menu),p=C.patrons[q.patron];return `<div class="game">${guideHTML()}<div class="topline"><div><div class="eyebrow">THE COUNTER IS OPEN</div><h2>오늘 밤도, 한 접시씩.</h2></div>${statsHTML()}</div>${resultHTML()}<div class="game-grid"><section class="panel"><div class="panel-head"><span>COUNTER 01 / 손님</span><span>${S.index+1} / ${S.queue.length}</span></div><canvas class="patron-scene" id="patron"></canvas><div class="order-wrap"><div class="customer-name">${p.name} / ${p.role}</div><div class="order-name">${r.name}</div><p class="dialogue">“${p.line}”</p><div class="order-bottom"><div><span class="muted" style="font-size:12px">${ingredientsText(r.ingredients)}</span><br><b style="color:var(--gold)">${r.price} C</b></div><span id="timer" class="timer">90.0s</span></div><div class="time-track"><i id="timeBar"></i></div><div class="tools" style="margin-top:16px"><button id="book" class="small">레시피 도감</button><button id="help" class="small ghost">조작법</button></div></div></section>${kitchenHTML()}</div>${deliveryHTML()}</div>`;}
+
+function serviceHTML(){
+ if(S.roomIndex!==S.index||S.roomDay!==S.day){S.roomDay=S.day;S.roomIndex=S.index;S.room='counter';S.acceptedIndex=null;S.packed=false;}
+ S.room=S.room||'counter';
+ let html=originalServiceHTML();
+ const accepted=S.acceptedIndex===S.index;
+ const nav=`<nav class="room-nav" aria-label="매장 이동"><button id="goCounter" class="${S.room==='counter'?'active':''}">01 · 카운터</button><span class="route-line">주문 접수 → 주방 조리 → 포장 → 전달</span><button id="goKitchen" class="${S.room==='kitchen'?'active':''}">02 · 주방으로 이동 →</button></nav>`;
+ html=html.replace('<div class="game-grid">',`${nav}<div class="game-grid scene-floor room-${S.room}">`);
+ const parcel=S.dish&&S.packed?`<div class="handoff"><div id="dropZone" class="drop-zone" role="button" tabindex="0" aria-label="손님에게 포장 음식 전달">손님에게 전달<br><small>포장 음식을 이곳에 놓으세요</small></div><button id="parcel" class="parcel" aria-label="포장 음식 집기, 방향키 대신 엔터로 선택 후 손님 영역에서 엔터"><i class="parcel-band"></i><b>CYBER SUSHI</b><small>QUALITY ${S.dish.quality} · DRAG TO SERVE</small></button><p class="muted">마우스·터치로 포장 상자를 끌어 손님 영역에 놓으세요.<br>키보드: 상자에서 Enter → 전달 영역에서 Enter</p></div>`:'';
+ html=html.replace('<canvas class="patron-scene"',`<canvas class="patron-scene"`);
+ html=html.replace('<div class="order-wrap">',`<div class="order-wrap"><div class="counter-actions">${accepted?'<span class="order-stamp">ORDER ACCEPTED · 주문 접수 완료</span>':'<button id="takeOrder" class="primary">주문 받기</button>'}</div>${parcel}`);
+ html=html.replace('PREP STATION / 조리대','BACK KITCHEN / 주방');
+ const order=E.menu(S,S.queue[S.index].menu);
+ if(S.room==='kitchen')html=html.replace('<div class="kitchen-body">',`<div class="kitchen-body"><div class="note"><b>주문서 · ${esc(order.name)}</b><br>${ingredientsText(order.ingredients)}<br>남은 시간 <strong id="kitchenTimer"></strong></div>`);
+ html=html.replace('<div class="bench">','<div class="bench"><div id="judgement" class="judgement" aria-live="polite"></div>');
+ return html;
+}
+function moveRoom(room){held=false;S.room=room;checkpoint();render();}
+function bindRooms(){
+ if(view!=='game'||S?.phase!=='service')return;
+ $('#goCounter').onclick=guarded(()=>moveRoom('counter'));
+ $('#goKitchen').onclick=guarded(()=>{if(S.acceptedIndex!==S.index){toast('카운터에서 주문 받기를 눌러 주세요.');return;}moveRoom('kitchen');});
+ if($('#takeOrder'))$('#takeOrder').onclick=action(()=>{S.acceptedIndex=S.index;beep();toast('주문을 받았습니다. 주방으로 이동하세요.');});
+ if($('#packFood'))$('#packFood').onclick=action(()=>{if(!S.dish)return;S.packed=true;S.room='counter';beep();toast('포장 완료! 상자를 손님에게 드래그하세요.');});
+ const box=$('#parcel'),zone=$('#dropZone');if(!box||!zone)return;
+ let drag=null,armed=false;
+ const deliver=guarded(()=>{if(!S.dish||!S.packed||S.room!=='counter')return;E.serve(S,uuid());S.packed=false;selected={};beep(S.lastResult.ok?'ok':'bad');checkpoint();render();});
+ box.onpointerdown=e=>{if(pending||saveError)return;e.preventDefault();box.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY};box.classList.add('dragging');zone.classList.add('ready');};
+ box.onpointermove=e=>{if(!drag)return;box.style.transform=`translate(${e.clientX-drag.x}px,${e.clientY-drag.y}px) rotate(-4deg)`;const r=zone.getBoundingClientRect();zone.classList.toggle('over',e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom);};
+ const reset=()=>{drag=null;box.style.transform='';box.classList.remove('dragging');zone.classList.remove('ready','over');};
+ box.onpointerup=e=>{if(!drag)return;const r=zone.getBoundingClientRect(),hit=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;reset();if(hit)deliver();else toast('손님 전달 영역에 놓아 주세요.');};
+ box.onpointercancel=reset;
+ box.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();armed=true;zone.classList.add('ready');zone.focus();}};
+ zone.onkeydown=e=>{if(e.key==='Enter'&&armed){e.preventDefault();armed=false;deliver();}};
+}
+function paintJudgement(){
+ const el=$('#judgement');if(!el)return;const f=S?.feedback,c=S?.cooking;
+ el.hidden=!(f&&f.left>0);if(f&&f.left>0){el.className='judgement '+f.label.toLowerCase();el.innerHTML=`<strong>${f.label}</strong><span>${f.score} / 100</span><small>${c?.cooldown>0?'잠깐 호흡을 고르세요 · '+c.cooldown.toFixed(1)+'s':'플레이팅 완료'}</small>`;}
+ const button=$('#miniAction');if(button){button.disabled=!!(c?.cooldown>0);if(c?.cooldown>0){held=false;$('#miniHint').textContent='다음 동작 준비 중…';}}
+}
+
+function originalServiceHTML(){const q=S.queue[S.index],r=E.menu(S,q.menu),p=C.patrons[q.patron];return `<div class="game">${guideHTML()}<div class="topline"><div><div class="eyebrow">THE COUNTER IS OPEN</div><h2>오늘 밤도, 한 접시씩.</h2></div>${statsHTML()}</div>${resultHTML()}<div class="game-grid"><section class="panel"><div class="panel-head"><span>COUNTER 01 / 손님</span><span>${S.index+1} / ${S.queue.length}</span></div><canvas class="patron-scene" id="patron"></canvas><div class="order-wrap"><div class="customer-name">${p.name} / ${p.role}</div><div class="order-name">${r.name}</div><p class="dialogue">“${p.line}”</p><div class="order-bottom"><div><span class="muted" style="font-size:12px">${ingredientsText(r.ingredients)}</span><br><b style="color:var(--gold)">${r.price} C</b></div><span id="timer" class="timer">90.0s</span></div><div class="time-track"><i id="timeBar"></i></div><div class="tools" style="margin-top:16px"><button id="book" class="small">레시피 도감</button><button id="help" class="small ghost">조작법</button></div></div></section>${kitchenHTML()}</div>${deliveryHTML()}</div>`;}
 function receiptHTML(l){const t=E.totals(l);return `<div class="panel receipt">${[['음식 판매 매출',l.sales],['팁',l.tips],['재료 구매 지출',l.purchases],['사용·폐기 재료 원가',l.cost],['영업이익',t.profit],['순현금흐름',t.cashflow],['현재 잔액',S.cash]].map(([k,v])=>`<div class="receipt-row ${k==='영업이익'?'total':''}"><span>${k}</span><b>${v.toLocaleString()} C</b></div>`).join('')}<div class="receipt-row"><span>만족 / 불만족 손님</span><b>${l.satisfied} / ${l.dissatisfied}</b></div></div>`;}
 function summaryHTML(){const next=S.day+1,newMenus=E.unlocked(next).filter(r=>r.day===next);return `<div class="summary"><div class="eyebrow">SHIFT COMPLETE / DAY ${S.day}</div><h1>오늘의 불을 잠시 끕니다.</h1><p class="muted">모든 손님을 응대했습니다. 다음 영업 전에 재고를 확인하세요.</p><div class="summary-grid">${receiptHTML(S.ledger)}<div><div class="panel receipt"><h3>장부는 이렇게 계산해요</h3><p class="note">영업이익 = 판매 매출 + 팁 − 사용·폐기 원가<br>순현금흐름 = 판매 매출 + 팁 − 구매 지출<br><br>남은 재고는 당일 원가에 포함되지 않습니다. 무료 시작 재고도 사용 시 기준 단가로 계산합니다.</p><b>다음 영업일: DAY ${next}</b><p class="muted">${newMenus.length?'신메뉴 '+newMenus.map(r=>r.name).join(', '):'기존 메뉴로 영업을 이어갑니다.'}</p></div><div class="note">정산 이후 구매는 다음 영업일 장부에 반영됩니다. 이미 구매한 금액: ${S.pendingPurchases||0}C</div><div class="action-row"><button id="prepare" class="primary">다음 날 시작 · DAY ${next} 준비</button><button id="book">레시피 도감</button></div></div></div>${deliveryHTML()}</div>`;}
 function prepHTML(){const unlocked=E.unlocked(S.day).filter(r=>r.day===S.day);return `<div class="summary"><div class="eyebrow">BEFORE THE RUSH</div><h1>DAY ${S.day} · 영업 준비</h1>${statsHTML()}<p class="note">손님 제한 시간은 흐르지 않습니다. 배송을 기다리거나 영업을 시작하세요.<br>준비 단계의 구매 지출은 DAY ${S.day} 장부에 반영됩니다. 영업 시작 시 손님·주문 목록을 생성하고 저장합니다.</p><div class="prep-list">${unlocked.length?unlocked.map(r=>`<div class="unlock"><small>NEW MENU / DAY ${r.day}</small><br><strong>${r.name}</strong><br>${ingredientsText(r.ingredients)}<br>${r.price} C</div>`).join(''):'<div class="unlock">오늘의 신메뉴 없음 · 재고를 충분히 준비하세요.</div>'}</div><div class="panel receipt"><h3>현재 재고</h3><div class="prep-list">${C.ingredients.map(i=>`<span>${foodIcon(i)} ${i.name} <b>${S.inventory[i.id]}</b></span>`).join('')}</div></div><div class="action-row"><button id="openShop" class="primary">영업 시작 · 손님 맞이하기</button><button id="book">레시피 도감</button></div>${deliveryHTML()}</div>`;}
@@ -125,18 +166,18 @@ function render(){
  bind('reloadCloud',()=>{if(pending&&!saveError)return toast('요청 처리 중입니다.');modal('<h2>클라우드 다시 불러오기</h2><p>저장에 실패한 현재 변경은 포기하고 서버의 마지막 저장으로 돌아갑니다. 기존 세이브를 덮어쓰지 않습니다.</p><button id="reloadConfirm" class="danger">마지막 클라우드 저장 불러오기</button>');$('#reloadConfirm').onclick=()=>{pending=null;saveError=false;closeModal();send('load');};});
  bind('clearMix',guarded(()=>{selected={};render();}));
  $$('.ingredient').forEach(b=>b.onclick=guarded(()=>{const k=b.dataset.ing;selected[k]=((selected[k]||0)+1);if(selected[k]>9)delete selected[k];render();}));
- bind('begin',action(()=>{E.begin(S,selected,uuid());selected={};beep();}));
+ bind('begin',action(()=>{if(S.acceptedIndex!==S.index)throw Error('카운터에서 주문을 먼저 받아 주세요.');E.begin(S,selected,uuid());selected={};beep();}));
  bind('serve',action(()=>{E.serve(S,uuid());selected={};beep(S.lastResult.ok?'ok':'bad');}));
  bind('discard',action(()=>{E.discard(S,uuid());toast('폐기했습니다. 사용한 재료는 반환되지 않습니다.');}));
  bind('prepare',action(()=>{E.prepare(S,uuid());}));bind('openShop',action(()=>{E.startDay(S,uuid());}));
  bind('restart',newGame);bind('backMenu',openMenu);
  bind('guideNext',action(()=>{if(S.tutorialStep<5)S.tutorialStep++;else S.tutorial=false;}));bind('guideSkip',action(()=>S.tutorial=false));
- const mini=$('#miniAction');if(mini){mini.onpointerdown=e=>{e.preventDefault();if(pending||saveError)return;mini.setPointerCapture(e.pointerId);if(S.cooking?.stage==='rice')held=true;else doMini();};mini.onpointerup=()=>held=false;mini.onpointercancel=()=>held=false;}
- lastVisual=visualKey();deliveryUpdate();height();
+ const mini=$('#miniAction');if(mini){mini.onpointerdown=e=>{e.preventDefault();if(pending||saveError||S.cooking?.cooldown>0)return;mini.setPointerCapture(e.pointerId);if(S.cooking?.stage==='rice')held=true;else doMini();};mini.onpointerup=()=>held=false;mini.onpointercancel=()=>held=false;}
+ bindRooms();lastVisual=visualKey();deliveryUpdate();height();
 }
 function visualKey(){return S?[S.phase,S.index,S.cooking?.stage,S.cooking?.cuts,!!S.dish].join(':'):'';}
-function doMini(){if(view!=='game'||paused||pending||saveError||!$('#modal').hidden)return;E.act(S);beep();checkpoint();render();}
-window.addEventListener('keydown',e=>{if(e.code!=='Space'||/INPUT|TEXTAREA|BUTTON/.test(e.target.tagName)||!$('#modal').hidden)return;if(view==='game'&&S?.cooking){e.preventDefault();if(e.repeat||pending||saveError)return;if(S.cooking.stage==='rice')held=true;else doMini();}});
+function doMini(){if(S?.cooking?.cooldown>0||S?.room!=='kitchen')return;if(view!=='game'||paused||pending||saveError||!$('#modal').hidden)return;E.act(S);beep();checkpoint();render();}
+window.addEventListener('keydown',e=>{if(e.code!=='Space'||/INPUT|TEXTAREA|BUTTON/.test(e.target.tagName)||!$('#modal').hidden)return;if(view==='game'&&S?.cooking){e.preventDefault();if(e.repeat||pending||saveError)return;if(S.room!=='kitchen'||S.cooking.cooldown>0)return;if(S.cooking.stage==='rice')held=true;else doMini();}});
 window.addEventListener('keyup',e=>{if(e.code==='Space')held=false;});window.addEventListener('blur',()=>held=false);
 function help(){modal(`<div class="eyebrow">CHEF'S FIELD MANUAL</div><h2>손으로 만드는 한 접시</h2><p>조작법을 열어도 영업 중 시간은 흐릅니다. 잠시 멈추려면 상단 메뉴를 누르세요.</p><div class="help-grid">${guides.slice(0,5).map((g,i)=>`<div><b>0${i+1} · ${g[0]}</b><span>${g[1]}</span></div>`).join('')}<div><b>90초와 다섯 번의 실수</b><span>90초까지 정확한 메뉴를 서빙하면 성공. 90초 초과 또는 오주문은 불만족 1명. 누적 5명이면 즉시 폐점합니다. 품질은 팁에만 영향을 줍니다.</span></div><div><b>팁 / 저장 / 탭</b><span>품질 60·80·95점부터 5·15·25%, 30초 이내 추가 5%. 최대 30%. 메뉴에서는 일시 정지, 배송은 현실 시간 기준. 한 계정·데모당 한 탭만 실행하세요.</span></div></div>`);}
 function settings(){modal(`<h2>설정</h2><p>효과음은 브라우저에서 합성하며 외부 음원은 사용하지 않습니다.</p><button id="toggleSound">효과음 ${muted?'켜기':'끄기'}</button><div class="note">저장 위치: ${auth?'Firebase 클라우드':'이 브라우저의 로컬 데모'}<br>새로고침하면 마지막 저장 상태로 돌아갑니다. 손님 시간은 오프라인 동안 멈추고 배송만 계속됩니다.</div>`);$('#toggleSound').onclick=guarded(()=>{muted=!muted;if(S){S.settings.muted=muted;checkpoint();}updateHeader();settings();if(!muted)beep();});}
@@ -210,6 +251,7 @@ function frame(now){
   }
   if(auth&&!pending&&!refreshing&&Date.now()>auth.expiresAt-90000){refreshing=true;refreshToken().catch(e=>{saveError=true;status(e.message,true);}).finally(()=>refreshing=false);}
   if(pending&&!saveError&&now-lastSave>25000){saveError=true;status('응답 지연 · 저장 재시도',true);}
+  if($('#kitchenTimer')&&S)$('#kitchenTimer').textContent=S.tutorial?'튜토리얼 · 시간 정지':Math.max(0,E.e.customerSeconds-S.elapsed).toFixed(1)+'s';
   if($('#timer')&&S){const left=Math.max(0,E.e.customerSeconds-S.elapsed);$('#timer').textContent=S.tutorial?'GUIDE':left.toFixed(1)+'s';$('#timer').classList.toggle('urgent',left<20);$('#timeBar').style.width=(left/E.e.customerSeconds*100)+'%';}
   const c=S?.cooking;if(c&&$('#cursor')){let pos,target,width;
    if(c.stage==='cut'){pos=E.cutCursor(c);target=E.cutTarget(c);width=.25/c.difficulty;$('#miniHint').textContent='중앙에 가까울수록 높은 점수 · 자동 진행까지 '+Math.max(0,2.7-c.time).toFixed(1)+'s';}
@@ -218,6 +260,7 @@ function frame(now){
    if(c.stage==='rice'){$('#cursor').style.top=Math.min(97,100*(1-pos))+'%';$('#target').style.top=100*(1-target-width/2)+'%';$('#target').style.height=100*width+'%';}else{$('#cursor').style.left=Math.min(99,100*pos)+'%';$('#target').style.left=100*(target-width/2)+'%';$('#target').style.width=100*width+'%';}
   }
   if(S?.dish)dishArt();
+  paintJudgement();
   if(now-lastDeliveryPaint>250){deliveryUpdate();lastDeliveryPaint=now;}
  }
  if(now>toastUntil)$('#toast').classList.remove('show');requestAnimationFrame(frame);
